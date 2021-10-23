@@ -28,45 +28,57 @@ int ft_strlen(char *str)
 	return (i);
 }
 
-void	print_tab(t_data *all)
+void	ft_putstr(char *str)
 {
-	int i = 0;
-	int j = 0;
+	write(1, str, ft_strlen(str));
+}
 
+void	destroy_tab(t_data *all)
+{
+	int i;
+
+	i = 0;
 	while (all->tab[i])
 	{
-		j = 0;
-		while (all->tab[i][j])
-		{
-			write(1, &all->tab[i][j], 1);
-			j++;
-		}
+		free(all->tab[i]);
+		all->tab[i] = NULL;
 		i++;
 	}
+	free(all->tab);
+	all->tab = NULL;
 }
 
 void	set_tab(t_data *all)
 {
-	int i = 0;
+	int i;
 	int j;
-	all->tab = malloc(sizeof(char *) * ((int)all->bheight));
+
+	i = 0;
+	all->tab = malloc(sizeof(char *) * ((int)all->bheight + 1));
 	all->tab[(int)all->bheight] = 0;
 	while (i < (int)all->bheight)
 	{
-		all->tab[i] = malloc(sizeof(char) * (int)all->bwidth + 1);
-		i++;
-	}
-	i = 0;
-	while (i < (int)all->bheight)
-	{
 		j = 0;
-		while (j < (int)all->bwidth)
+		all->tab[i] = malloc(sizeof(char) * ((int)all->bwidth + 1));
+		while(j < (int)all->bwidth)
 		{
 			all->tab[i][j] = all->bchar;
-			all->tab[i][j + 1] = '\n';
-			all->tab[i][j + 2] = '\0';
 			j++;
 		}
+		all->tab[i][j] = 0;
+		i++;
+	}
+}
+
+void	print_tab(t_data *all)
+{
+	int i;
+
+	i = 0;
+	while (all->tab[i])
+	{
+		ft_putstr(all->tab[i]);
+		ft_putstr("\n");
 		i++;
 	}
 }
@@ -87,28 +99,32 @@ int main(int ac, char **av)
 	}
 	int ret;
 
-		ret = fscanf(file, "%f %f %c", &all.bwidth, &all.bheight, &all.bchar);
-		printf("A %f %f %c\n", all.bwidth, all.bheight, all.bchar);
-		ret = fscanf(file, "%[^\n]", &all.temp);
+	ret = fscanf(file, "%f %f %c", &all.bwidth, &all.bheight, &all.bchar);
+	printf("A %f %f %c\n", all.bwidth, all.bheight, all.bchar);
+	all.temp = 0;
+	ret = fscanf(file, "%[^\n]", &all.temp);
+	if (all.temp != 0)
+	{
+		write(1, "Error: Operation file corrupted\n", ft_strlen("Error: Operation file corrupted\n"));
+		return(0);
+	}
+	ret = fscanf(file, "%c", &all.temp);
+	all.temp = 0;
+	set_tab(&all);
+	print_tab(&all);
+	while (ret > 0)
+	{
+		ret = fscanf(file, "%c %f %f %f %f %c", &all.r, &all.x, &all.y, &all.fwidth, &all.fheight, &all.fchar);
+		printf("B %c %f %f %f %f %c\n", all.r, all.x, all.y, all.fwidth, all.fheight, all.fchar);
+		fscanf(file, "%[^\n]", &all.temp);
 		if (all.temp != 0)
 		{
 			write(1, "Error: Operation file corrupted\n", ft_strlen("Error: Operation file corrupted\n"));
 			return(0);
 		}
-		set_tab(&all);
-		ret = fscanf(file, "%c", &all.temp);
+		fscanf(file, "%c", &all.temp);
 		all.temp = 0;
-
-		ret = fscanf(file, "%c %f %f %f %f %c", &all.r, &all.x, &all.y, &all.fwidth, &all.fheight, &all.fchar);
-		print_tab(&all);
-		printf("B %c %f %f %f %f %c\n", all.r, all.x, all.y, all.fwidth, all.fheight, all.fchar);
-//	{
-//		printf("%d TEST %s\n", ret, temp);
-//	}
-	/*
-	if (fread(temp, sizeof(char), 1, file) == 0)
-	{
-	   write(1, "lol\n", 4);
-	   exit (1);
-	}*/
+	}
+	destroy_tab(&all);
+	fclose(file);
 }
