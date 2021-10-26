@@ -147,16 +147,8 @@ void	intizer(t_all* all, int *x, int *y, int *w, int *h)
 		*y = (int)all->figure.y;
 	*w = all->figure.x + all->figure.width;
 	*h = all->figure.y + all->figure.height;
-//	if (all->figure.width != (int)all->figure.width)
-//		all->figure.width += 1;
-//	if (all->figure.height != (int)all->figure.height)
-//		all->figure.height += 1;
-//	if (all->figure.x + all->figure.width < (int)all->figure.x + (int)all->figure.width)
-//		all->figure.x += 1;
-//	if (all->figure.y + all->figure.height < (int)all->figure.y + (int)all->figure.height)
-//		all->figure.y += 1;
 }
-
+/*
 void	add_figure(t_all *all)
 {
 	int x;
@@ -185,6 +177,27 @@ void	add_figure(t_all *all)
 				else
 					all->tab[i][j] = all->figure.c;
 			}
+			j++;
+		}
+		i++;
+	}
+}
+*/
+
+void	add_figure(t_all *all)
+{
+	int i = 0;
+	int j = 0;
+	float	bx = all->figure.x + all->figure.width;
+	float	by = all->figure.y + all->figure.height;
+
+	while (i < all->back.height)
+	{
+		j = 0;
+		while (j < all->back.width)
+		{
+			if (i >= all->figure.y && i <= bx && j >= all->figure.x && j <= by)
+				all->tab[i][j] = all->figure.c;
 			j++;
 		}
 		i++;
