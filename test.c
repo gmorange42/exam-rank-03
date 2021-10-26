@@ -109,7 +109,6 @@ int		check_and_stock_back(t_all *all)
 	int ret;
 	char test;
 	ret = fscanf(all->file, "%f %f %c", &all->back.width, &all->back.height, &all->back.c);
-	ft_putstr("LOL\n");
 	if (ret != 3)
 	{
 		ft_putstr("Error: Operation file corrupted\n");
@@ -126,45 +125,55 @@ int		check_and_stock_back(t_all *all)
 	return(stock_back(all));
 }
 
-void	intizer(t_all* all)
+void	intizer(t_all* all, int *x, int *y, int *w, int *h)
 {
 	if (all->figure.x != (int)all->figure.x)
-		all->figure.x = (int)all->figure.x + 1;
+		*x = (int)all->figure.x + 1;
+	else
+		*x = (int)all->figure.x;
 	if (all->figure.y != (int)all->figure.y)
-		all->figure.y = (int)all->figure.y + 1;
-	if (all->figure.width != (int)all->figure.width)
-		all->figure.width = (int)all->figure.width + 1;
-	if (all->figure.height != (int)all->figure.height)
-		all->figure.height = (int)all->figure.height + 1;
-	if (all->figure.x + all->figure.width < (int)all->figure.x + (int)all->figure.width)
-	{
-		puts("1");
-		all->figure.x += 1;
-	}
-	if (all->figure.y + all->figure.height < (int)all->figure.y + (int)all->figure.height)
-	{
-		puts("2");
-		all->figure.y += 1;
-	}
-	printf("TEST %f \n", all->figure.x);
+		*y = (int)all->figure.y + 1;
+	else
+		*y = (int)all->figure.y;
+	*w = all->figure.x + all->figure.width;
+	*h = all->figure.y + all->figure.height;
+//	if (all->figure.width != (int)all->figure.width)
+//		all->figure.width += 1;
+//	if (all->figure.height != (int)all->figure.height)
+//		all->figure.height += 1;
+//	if (all->figure.x + all->figure.width < (int)all->figure.x + (int)all->figure.width)
+//		all->figure.x += 1;
+//	if (all->figure.y + all->figure.height < (int)all->figure.y + (int)all->figure.height)
+//		all->figure.y += 1;
 }
 
 void	add_figure(t_all *all)
 {
+	int x;
+	int y;
+	int w;
+	int	h;
 	int i;
 	int j;
 
-	intizer(all);
-	i = (int)all->figure.y;
-	j = (int)all->figure.x;
+	intizer(all, &x, &y, &w, &h);
+	i = y;
+	j = x;
 	while (i <= ((int)all->figure.height + (int)all->figure.y))
 	{
-		printf("i = %f %d\n", all->figure.y, (int)all->figure.height + (int)all->figure.y);
-		j = (int)all->figure.x;
-		printf("j = %f %d\n", all->figure.x, (int)all->figure.width + (int)all->figure.x);
+		j = x;
 		while(j <= ((int)all->figure.width + (int)all->figure.x))
 		{
-			all->tab[i][j] = all->figure.c;
+			if (i < all->back.height && j < all->back.width && i >= 0 && j >= 0)
+			{
+				if (all->figure.r == 'r')
+				{
+					if (i == y || i == h || j == x || j == w)
+						all->tab[i][j] = all->figure.c;
+				}
+				else
+					all->tab[i][j] = all->figure.c;
+			}
 			j++;
 		}
 		i++;
@@ -192,7 +201,6 @@ int		figure(t_all *all)
 	}
 	if (test == '\0')
 		return(2);
-	printf("ret = %d\n%c %f %f %f %f %c\n",ret , all->figure.r, all->figure.x, all->figure.y, all->figure.width, all->figure.height, all->figure.c);
 	add_figure(all);
 	return (0);
 }
