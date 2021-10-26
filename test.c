@@ -128,11 +128,21 @@ int		check_and_stock_back(t_all *all)
 void	intizer(t_all* all, int *x, int *y, int *w, int *h)
 {
 	if (all->figure.x != (int)all->figure.x)
-		*x = (int)all->figure.x + 1;
+	{
+		if ((int)all->figure.x >= 0)
+			*x = (int)all->figure.x + 1;
+		else
+			*x = (int)all->figure.x - 1;
+	}
 	else
 		*x = (int)all->figure.x;
 	if (all->figure.y != (int)all->figure.y)
-		*y = (int)all->figure.y + 1;
+	{
+		if ((int)all->figure.y >= 0)
+			*y = (int)all->figure.y + 1;
+		else
+			*y = (int)all->figure.y - 1;
+	}
 	else
 		*y = (int)all->figure.y;
 	*w = all->figure.x + all->figure.width;
@@ -159,10 +169,11 @@ void	add_figure(t_all *all)
 	intizer(all, &x, &y, &w, &h);
 	i = y;
 	j = x;
-	while (i <= ((int)all->figure.height + (int)all->figure.y))
+	printf("x %d\ny %d\nw %d\nh %d\ni %d\nj %d\n", x, y, w, h, i, j);
+	while (i <= h)
 	{
 		j = x;
-		while(j <= ((int)all->figure.width + (int)all->figure.x))
+		while(j <= w)
 		{
 			if (i < all->back.height && j < all->back.width && i >= 0 && j >= 0)
 			{
