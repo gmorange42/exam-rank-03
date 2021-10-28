@@ -95,33 +95,44 @@ int		back(t_all *all)
 	malloc_and_stock_back(all);
 	return (0);
 }
-/*
+
 void	add_shape(t_all *all)
 {
 	int i = 0;
 	int j = 0;
 
-	int bx = all->s_width + all->s_x;
-	int yx = all->s_height + all->syx;
+	float bx = all->s_width + all->s_x;
+	float by = all->s_height + all->s_y;
 
 	while (all->back[i])
 	{
+		j = 0;
 		while (all->back[i][j])
 		{
-			if (i >= all->
+			if (i >= all->s_y && i <= by && j >= all->s_x && j <= bx)
+			{
+				if (all->s_r == 'r')
+				{
+					if (i >= all->s_y + 1 && i <= by - 1 && j >= all->s_x  + 1&& j <= bx -1)
+						;
+					else
+					all->back[i][j] = all->s_char;
+				}
+				else
+					all->back[i][j] = all->s_char;
+			}
 			j++;
 		}
 		i++;
 	}
 }
-*/
+
 int		shape(t_all *all)
 {
 	char	test;
 	all->s_r = '\0';
 	if (((fscanf(all->file, "%c %f %f %f %f %c", &all->s_r,  &all->s_x, &all->s_y, &all->s_width, &all->s_height, &all->s_char)) != 6) && all->s_r != '\0')
 		return(ft_putstr("Error: Operation file corrupted\n"));
-	printf("%c %f %f %f %f %c\n", all->s_r,  all->s_x, all->s_y, all->s_width, all->s_height, all->s_char);
 	if (all->s_r == '\0')
 		return (2);
 	if (all->s_r != 'r' && all->s_r != 'R')
@@ -129,7 +140,7 @@ int		shape(t_all *all)
 	fscanf(all->file, "%c", &test);
 	if (test != '\n' && test != '\0')
 		return(ft_putstr("Error: Operation file corrupted\n"));
-//	add_shape(all);
+	add_shape(all);
 	return (0);
 }
 
@@ -143,7 +154,6 @@ int main(int ac, char **av)
 		return(ft_putstr("Error: Operation file corrupted\n"));
 	if (back(&all) == 1)
 		return (1);
-	print_tab(&all);
 	while (ret != 2)
 	{
 		ret = shape(&all);
@@ -153,6 +163,7 @@ int main(int ac, char **av)
 			return(1);
 		}
 	}
+	print_tab(&all);
 	destroy(&all);
 	return (0);
 }
