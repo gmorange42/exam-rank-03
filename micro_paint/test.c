@@ -84,12 +84,12 @@ int		malloc_and_stock_back(t_all *all)
 
 int		back(t_all *all)
 {
-	char test;
+//	char test;
 	if ((fscanf(all->file, "%f %f %c", &all->b_width, &all->b_height, &all->b_char)) != 3)
 		return(ft_putstr("Error: Operation file corrupted\n"));
-	fscanf(all->file, "%c", &test);
-	if (test != '\n' && test != '\0')
-		return(ft_putstr("Error: Operation file corrupted\n"));
+//	fscanf(all->file, "%c", &test);
+//	if (test != '\n' && test != '\0')
+//		return(ft_putstr("Error: Operation file corrupted\n"));
 	if ((int)all->b_width <= 0 || (int)all->b_width > 300 || (int)all->b_height <= 0 || (int)all->b_height > 300)
 		return(ft_putstr("Error: Operation file corrupted\n"));
 	malloc_and_stock_back(all);
