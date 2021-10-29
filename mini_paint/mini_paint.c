@@ -1,162 +1,172 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct	s_zone
+typedef struct	s_all
 {
-	int		width;
-	int		height;
-	char	background;
-}				t_zone;
+	FILE	*file;
+	char	**tab;
+	int		b_width;
+	int		b_height;
+	char	b_char;
+	char	s_c;
+	float	s_x;
+	float	s_y;
+	float	s_radius;
+	char	s_char;
+}				t_all;
 
-typedef struct	s_shape
+int		ft_strlen(char *str)
 {
-	char	type;
-	float	x;
-	float	y;
-	float	radius;
-	char	color;
-}				t_shape;
+	int i = 0;
 
-int
-	ft_strlen(char const *str)
-{
-	int	i;
-
-	i = 0;
 	while (str[i])
 		i++;
 	return (i);
 }
 
-char
-	*get_zone(FILE *file, t_zone *zone)
+void	ft_putstr(char *str)
 {
-	int		i;
-	char	*tmp;
-
-	if (fscanf(file, "%d %d %c\n", &zone->width, &zone->height, &zone->background) != 3)
-		return (NULL);
-	if (zone->width <= 0 || zone->width > 300 || zone->height <= 0 || zone->height > 300)
-		return (NULL);
-	if (!(tmp = (char*)malloc(sizeof(*tmp) * (zone->width * zone->height))))
-		return (NULL);
-	i = 0;
-	while (i < zone->width * zone->height)
-		tmp[i++] = zone->background;
-	return (tmp);
+	write(1, str, ft_strlen(str));
 }
 
-int
-	in_circle(float x, float y, t_shape *shape)
+void	destroy(t_all *all)
 {
-	float	distance;
+	int i = 0;
 
-	distance = sqrtf(powf(x - shape->x, 2.) + powf(y - shape->y, 2.));
-	if (distance <= shape->radius)
+	while (all->tab[i])
 	{
-		if ((shape->radius - distance) < 1.00000000)
-			return (2);
-		return (1);
+		free(all->tab[i]);
+		all->tab[i] = NULL;
+		i++;
 	}
-	return (0);
+	free(all->tab);
+	all->tab = NULL;
 }
 
-void
-	draw_shape(t_zone *zone, char *drawing, t_shape *shape)
+void	print_tab(t_all *all)
 {
-	int	y;
-	int	x;
-	int	is_it;
+	int i = 0;
 
-	y = 0;
-	while (y < zone->height)
+	while (all->tab[i])
 	{
-		x = 0;
-		while (x < zone->width)
-		{
-			is_it = in_circle((float)x, (float)y, shape);
-			if ((shape->type == 'c' && is_it == 2)
-				|| (shape->type == 'C' && is_it))
-				drawing[(y * zone->width) + x] = shape->color;
-			x++;
-		}
-		y++;
-	}
-}
-
-int
-	draw_shapes(FILE *file, t_zone *zone, char *drawing)
-{
-	t_shape	tmp;
-	int		ret;
-
-	while ((ret = fscanf(file, "%c %f %f %f %c\n", &tmp.type, &tmp.x, &tmp.y, &tmp.radius, &tmp.color)) == 5)
-	{
-		if (tmp.radius <= 0.00000000 || (tmp.type != 'c' && tmp.type != 'C'))
-			return (0);
-		draw_shape(zone, drawing, &tmp);
-	}
-	if (ret != -1)
-		return (0);
-	return (1);
-}
-
-void
-	draw_drawing(t_zone *zone, char *drawing)
-{
-	int	i;
-
-	i = 0;
-	while (i < zone->height)
-	{
-		write(1, drawing + (i * zone->width), zone->width);
-		write(1, "\n", 1);
+		ft_putstr(all->tab[i]);
+		ft_putstr("\n");
 		i++;
 	}
 }
 
-int
-	str_error(char const *str)
+int		back(t_all *all)
 {
-	if (str)
-		write(1, str, ft_strlen(str));
-	return (1);
+	int i = 0;
+	int j = 0;
+	int ret;
+	
+	ret = fscanf(all->file, "%d %d %c\n", &all->b_width, &all->b_height, &all->b_char);
+	if (ret != 3 ||all->b_width <= 0 || all->b_width > 300 || all->b_height <= 0 || all->b_height > 300)
+	{
+		ft_putstr("Error: Operation file corrupted\n");
+		return (1);
+	}
+	if (!(all->tab = malloc(sizeof(char *) * (all->b_height + 1))))
+		return(1);
+	while (i < all->b_height)
+	{
+		j = 0;
+		all->tab[i] = NULL;
+		if (!(all->tab[i] = malloc(sizeof(char) * (all->b_width + 1))))
+			return (1);
+		while (j < all->b_width)
+		{
+			all->tab[i][j] = all->b_char;
+			j++;
+		}
+		all->tab[i][j] = 0;
+		i++;
+	}
+	all->tab[i] = NULL;
+	return (0);
 }
 
-int
-	clear_all(FILE *file, char *drawing, char const *str)
+void	add_shape(t_all *all)
 {
-	if (file)
-		fclose(file);
-	if (drawing)
-		free(drawing);
-	if (str)
-		str_error(str);
-	return (1);
+	int		i = 0;
+	int		j = 0;
+	float		pos;
+
+	while (all->tab[i])
+	{
+		j = 0;
+		while (all->tab[i][j])
+		{
+			pos = sqrtf(((j - all->s_x) * (j - all->s_x)) + ((i - all->s_y) * (i - all->s_y)));
+			if (pos <= all->s_radius)
+			{
+				if (all->s_c == 'c')
+				{
+					if (pos <= all->s_radius - 1)
+						;
+					else
+					all->tab[i][j] = all->s_char;
+				}
+				else
+					all->tab[i][j] = all->s_char;
+			}
+			j++;
+		}
+		i++;
+	}
 }
 
-int
-	main(int argc, char **argv)
+int		shape(t_all *all)
 {
-	FILE	*file;
-	t_zone	zone;
-	char	*drawing;
+	int		ret = 0; 
 
-	zone.width = 0;
-	zone.height = 0;
-	zone.background = 0;
-	drawing = NULL;
-	if (argc != 2)
-		return (str_error("Error: argument\n"));
-	if (!(file = fopen(argv[1], "r")))
-		return (str_error("Error: Operation file corrupted\n"));
-	if (!(drawing = get_zone(file, &zone)))
-		return (clear_all(file, NULL, "Error: Operation file corrupted\n"));
-	if (!(draw_shapes(file, &zone, drawing)))
-		return (clear_all(file, drawing, "Error: Operation file corrupted\n"));
-	draw_drawing(&zone, drawing);
-	clear_all(file, drawing, NULL);
+	all->s_c = 0;
+	ret = fscanf(all->file, "%c %f %f %f %c\n", &all->s_c, &all->s_x, &all->s_y, &all->s_radius, &all->s_char);
+	if (all->s_c == '\n' || all->s_c == '\0')
+		return (2);
+	if (ret != 5 || (all->s_c != 'c' && all->s_c != 'C'))
+	{
+		ft_putstr("Error: Operation file corrupted\n");
+		return (1);
+	}
+	add_shape(all);
+	return (0);
+}
+
+int		main(int ac, char **av)
+{
+	int ret = 0;
+	t_all all;
+	if (ac != 2)
+	{
+		ft_putstr("Error: argument\n");
+		return (1);
+	}
+	if (!(all.file = fopen(av[1], "r")))
+	{
+		ft_putstr("Error: Operation file corrupted\n");
+		return (1);
+	}
+	if (back(&all) == 1)
+	{
+		fclose(all.file);
+		return (1);
+	}
+	while (ret != 2)
+	{
+		ret = shape(&all);
+		if (ret == 1)
+		{
+			fclose(all.file);
+			destroy(&all);
+			return (1);
+		}
+	}
+	print_tab(&all);
+	destroy(&all);
+	fclose(all.file);
 	return (0);
 }
