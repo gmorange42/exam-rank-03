@@ -63,11 +63,9 @@ int		back(t_all *all)
 	int	i = 0;
 	int	j;
 	int	ret;
-	char	test;
 
-	ret = fscanf(all->file, "%d %d %c", &all->b_width, &all->b_height, &all->b_char);
-	fscanf(all->file, "%c", &test);
-	if (ret != 3 || (test != '\n' && test != '\0') || all->b_width <= 0 || all->b_width > 300 || all->b_height <= 0 || all->b_height > 300)
+	ret = fscanf(all->file, "%d %d %c\n", &all->b_width, &all->b_height, &all->b_char);
+	if (ret != 3 || all->b_width <= 0 || all->b_width > 300 || all->b_height <= 0 || all->b_height > 300)
 	{
 		ft_putstr("Error: Operation file corrupted\n");
 		return (1);
@@ -129,13 +127,12 @@ int		add_shape(t_all *all)
 int		shape(t_all *all)
 {
 	int ret;
-	char test;
-	all->s_r = '\0';
-	ret = fscanf(all->file, "%c %f %f %f %f %c", &all->s_r, &all->s_x, &all->s_y, &all->s_width, &all->s_height, &all->s_char);
-	if (all->s_r == '\0')
+
+	all->s_r = 0;
+	ret = fscanf(all->file, "%c %f %f %f %f %c\n", &all->s_r, &all->s_x, &all->s_y, &all->s_width, &all->s_height, &all->s_char);
+	if (all->s_r == '\n' || all->s_r == '\0')
 		return (2);
-	fscanf(all->file, "%c", &test);
-	if (ret != 6 || (test != '\n' && test != '\0') || (all->s_r != 'r' && all->s_r != 'R'))
+	if (ret != 6 || (all->s_r != 'r' && all->s_r != 'R') || all->s_width <= 0 || all->s_height <= 0)
 	{
 		ft_putstr("Error: Operation file corrupted\n");
 		return (1);

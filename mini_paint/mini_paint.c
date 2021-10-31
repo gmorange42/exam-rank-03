@@ -60,7 +60,7 @@ void	print_tab(t_all *all)
 int		back(t_all *all)
 {
 	int i = 0;
-	int j = 0;
+	int j;
 	int ret;
 	
 	ret = fscanf(all->file, "%d %d %c\n", &all->b_width, &all->b_height, &all->b_char);
@@ -127,7 +127,7 @@ int		shape(t_all *all)
 	ret = fscanf(all->file, "%c %f %f %f %c\n", &all->s_c, &all->s_x, &all->s_y, &all->s_radius, &all->s_char);
 	if (all->s_c == '\n' || all->s_c == '\0')
 		return (2);
-	if (ret != 5 || (all->s_c != 'c' && all->s_c != 'C'))
+	if (ret != 5 || (all->s_c != 'c' && all->s_c != 'C') || all->s_radius <= 0)
 	{
 		ft_putstr("Error: Operation file corrupted\n");
 		return (1);
